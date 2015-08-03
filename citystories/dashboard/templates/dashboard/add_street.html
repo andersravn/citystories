@@ -1,0 +1,20 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <form action="/dash/add-street/" method="POST">
+          {% csrf_token %}
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="street_name">Gadens navn</label>
+              <input type="text" id="street_name" class="form-control" name="street_name">
+            </div>
+            <input type="submit" class="btn btn-primary" value="Tilføj">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

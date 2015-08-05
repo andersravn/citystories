@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
 import dashboard.scripts as scripts
+from api.models import Place
 
 # Create your views here.
 
@@ -31,15 +32,26 @@ def add_street_view(request):
 
     if request.method == 'POST':
         street = request.POST['street_name']
-        scripts.add_street(street)
+        loaded = scripts.add_street(street)  # Tilføjer sedler, og returnerer antal loadede/ikke loadede.
+        messages.success(request, str(loaded) + ' sedler tilføjet. Antal der ikke blev indlæst: ')
+        return redirect('/dash/add-street/')
+
+
+def stadsarkiv_api(request):
+    context = {}
+    template_name = 'dashboard/stadsarkiv_api.html'
+
+    if request.method == 'GET':
+        context['places'] = Place.objects.all()
+        return render(request, template_name, context)
 
 
 def scripts_view(request):
     context = {}
-    templates_name = 'dashboard/scripts.html'
+    template_name = 'dashboard/scripts.html'
 
     if request.method == 'GET':
-        return render(request, templates_name, context)
+        return render(request, template_name, context)
 
 
 def load_csv(request):

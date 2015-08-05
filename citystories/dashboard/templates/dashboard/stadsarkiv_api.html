@@ -1,0 +1,23 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<table class="table table-hover">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Navn</th>
+    <th>Rank</th>
+    <th>API</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for place in places %}
+    <tr>
+      <td>{{ place.placeid }}</td>
+      <td>{{ place.name }}</td>
+      <td>{{ place.rank }}</td>
+      <td><a href="https://openaws.appspot.com/records?collection=1&locations={{ place.placeid }}">Se API</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

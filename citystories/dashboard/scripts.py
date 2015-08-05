@@ -3,7 +3,7 @@
 
 import csv, os, datetime, requests
 
-from django.shortcuts import redirect
+from django.db import DataError
 
 from api.models import Place, Note
 
@@ -45,6 +45,7 @@ def get_notes(place):
     response = requests.get(url + str(place.placeid))
     data = response.json()
     note_type = ''
+    loaded = 0
 
     # Tjekker om result objektet er tomt.
     try:
@@ -65,6 +66,10 @@ def get_notes(place):
         analog_content = r.get('analog_content', 'none')
         media = False
         admin_data = r['administration'].get('admin_data', 'none')
+
+        # Tjekker om analog_content (id'et) er længere en den allokerede længde i databasen.
+        if len(analog_content) > 8:
+            continue
 
         if admin_data is not 'none':
             media = admin_data.get('formidlingsegnet', 'none')
@@ -92,6 +97,8 @@ def get_notes(place):
                     media=media,
                     place=place)
         note.save()
+        loaded += 1
+    return loaded
 
 
 # 8494 tilbage efter første run.
@@ -114,9 +121,10 @@ def add_coords():
 def add_street(street):
     Note.objects.all().delete()
     places = Place.objects.filter(name__contains=street)
+    loaded = 0
 
     for place in places:
-        get_notes(place)
+        loaded += get_notes(place)
         place.notes_loaded = True  # notes_loaded indikerer nu om der loaded koordinater på sedler knytter til et placeid
         place.save()
-    return redirect('/dash/add-street/')
+    return loaded

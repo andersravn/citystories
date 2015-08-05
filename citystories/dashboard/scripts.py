@@ -67,10 +67,6 @@ def get_notes(place):
         media = False
         admin_data = r['administration'].get('admin_data', 'none')
 
-        # Tjekker om analog_content (id'et) er længere en den allokerede længde i databasen.
-        if len(analog_content) > 8:
-            continue
-
         if admin_data is not 'none':
             media = admin_data.get('formidlingsegnet', 'none')
 

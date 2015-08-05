@@ -33,7 +33,7 @@ def add_street_view(request):
     if request.method == 'POST':
         street = request.POST['street_name']
         loaded = scripts.add_street(street)  # Tilføjer sedler, og returnerer antal loadede/ikke loadede.
-        messages.success(request, str(loaded) + ' sedler tilføjet. Antal der ikke blev indlæst: ')
+        messages.success(request, str(loaded) + ' sedler tilføjet.')
         return redirect('/dash/add-street/')
 
 

@@ -37,7 +37,7 @@ class Place(models.Model):
 
 
 class Note(models.Model):
-    note_id = models.CharField(max_length=8)
+    note_id = models.CharField(max_length=25)
     text_content = models.TextField()
     note_type = models.CharField(max_length=10)
     from_date = models.DateField()

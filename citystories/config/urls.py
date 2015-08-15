@@ -21,9 +21,9 @@ from api import views
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
-                       url(r'^admin/', include(admin.site.urls)),
-                       url('^$', views.front_view, name='front'),
-                       url(r'^v1/', include('api.urls')),
-                       url(r'^dash/', include('dashboard.urls')),
-)
+urlpatterns = [
+    url(r'^admin/', include(admin.site.urls)),
+    url('^$', views.front_view, name='front'),
+    url(r'^v1/', include('api.urls')),
+    url(r'^dash/', include('dashboard.urls', namespace='dashboard')),
+]

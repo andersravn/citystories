@@ -20,7 +20,7 @@ class EntrySerializer(serializers.ModelSerializer):
 class TestEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = TestEntry
-        fields = ('content', 'lat', 'long')
+        fields = ('text_content', 'lat', 'long')
 
 
 class UserSerializer(serializers.ModelSerializer):

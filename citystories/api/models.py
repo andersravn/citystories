@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from .utils import haversine
+
 # Create your models here.
 
 
@@ -17,13 +19,16 @@ class Entry(models.Model):
 
 
 class TestEntry(models.Model):
-    content = models.TextField()
+    text_content = models.TextField()
     lat = models.DecimalField(max_digits=17, decimal_places=14)
     long = models.DecimalField(max_digits=17, decimal_places=14)
     created = models.DateTimeField(auto_now_add=True)
 
+    def is_nearby(self, current_lat, current_long):
+        return haversine(current_long, current_lat, self.long, self.lat) > 10
+
     def __str__(self):
-        return self.content
+        return self.text_content
 
 
 class Place(models.Model):

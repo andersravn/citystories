@@ -48,6 +48,6 @@ Thumbs.db
 
 # Django stuff #
 ################
-.idea/*
+.idea
 static/*
 local.py

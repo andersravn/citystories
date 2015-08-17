@@ -25,8 +25,8 @@ def byteify(input):
 
 # Indsætter alle unikke steder i Sejrs Sedler.
 def load_csv():
-    #Place.objects.all().delete()
-    with open('/Users/andersravn/Projekter/citystories/citystories/dashboard/sejrssedler_steder.csv', 'rt') as csvfile:
+    Place.objects.all().delete()
+    with open(os.path.dirname(os.path.abspath(__file__)) + '/sejrssedler_steder.csv', 'rt') as csvfile:
         notereader = csv.reader(csvfile, delimiter=',')
         firstline = True
         for row in notereader:

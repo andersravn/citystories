@@ -115,7 +115,6 @@ def add_coords():
 
 
 def add_street(street):
-    Note.objects.all().delete()
     places = Place.objects.filter(name__contains=street)
     loaded = 0
 

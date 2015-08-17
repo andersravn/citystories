@@ -9,15 +9,15 @@ DEBUG = False
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.citystories.dk']
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'andersravn',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '',
+        'NAME': 'citystories',
+        'USER': 'super',
+        'PASSWORD': os.environ['DB_PASS'],
+        'HOST': 'skoer-63.postgres.pythonanywhere-services.com',
+        'PORT': '10063',
     }
 }

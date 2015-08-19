@@ -1,3 +1,6 @@
+ #!/usr/bin/env python
+ # -*- coding: utf-8 -*-
+
 from django.contrib.gis import admin
 from api.models import Entry, Place, Note, TestEntry
 

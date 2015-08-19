@@ -13,7 +13,7 @@ ALLOWED_HOSTS = ['.citystories.dk']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'citystories',
         'USER': 'super',
         'PASSWORD': os.environ['DB_PASS'],

@@ -5,6 +5,7 @@ from django.shortcuts import render, render_to_response, redirect
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.gis.geos import fromstr
 
 from rest_framework import permissions, viewsets, generics
 
@@ -33,7 +34,17 @@ class EntryViewSet(viewsets.ModelViewSet):
         obj.user = self.request.user
 
 
-class TestEntryViewSet(generics.ListCreateAPIView):
+class TestEntryViewSet(generics.ListAPIView):
+    queryset = TestEntry.objects.all()
+    serializer_class = TestEntrySerializer
+
+    def get_queryset(self):
+        location = self.kwargs['location']
+        pnt = fromstr('POINT(' + location + ')', srid=4326)
+        return TestEntry.objects.filter(pnt__distance_lte=(pnt, 10))
+
+
+class CreateTestEntryViewSet(generics.ListCreateAPIView):
     queryset = TestEntry.objects.all()
     serializer_class = TestEntrySerializer
 

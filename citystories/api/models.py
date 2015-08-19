@@ -1,3 +1,6 @@
+ #!/usr/bin/env python
+ # -*- coding: utf-8 -*-
+
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 
@@ -22,15 +25,12 @@ class TestEntry(models.Model):
     text_content = models.TextField()
     lat = models.DecimalField(max_digits=17, decimal_places=14)
     long = models.DecimalField(max_digits=17, decimal_places=14)
-    pnt = models.PointField(null=True, blank=True)
+    pnt = models.PointField(null=True, blank=True, geography=True)
     objects = models.GeoManager()
     created = models.DateTimeField(auto_now_add=True)
 
-    def is_nearby(self, current_lat, current_long):
-        return haversine(current_long, current_lat, self.long, self.lat) > 10
-
     def __str__(self):
-        return self.text_content
+        return self.text_content.encode('ascii', errors='replace')  # .encode løser UnicodeEncodeError.
 
 
 class Place(models.Model):

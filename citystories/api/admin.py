@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib.gis import admin
 from api.models import Entry, Place, Note, TestEntry
 
 # Register your models here.
@@ -6,4 +6,4 @@ from api.models import Entry, Place, Note, TestEntry
 admin.site.register(Entry)
 admin.site.register(Place)
 admin.site.register(Note)
-admin.site.register(TestEntry)
+admin.site.register(TestEntry, admin.GeoModelAdmin)

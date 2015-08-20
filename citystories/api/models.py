@@ -30,7 +30,7 @@ class TestEntry(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.text_content.encode('ascii', errors='replace')  # .encode løser UnicodeEncodeError.
+        return self.text_content
 
 
 class Place(models.Model):

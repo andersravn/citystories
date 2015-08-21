@@ -34,4 +34,4 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ('text_content', 'from_date', 'place')
+        fields = ('text_content', 'from_date', 'lat', 'lng', 'place')

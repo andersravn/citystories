@@ -37,6 +37,14 @@ def load_csv():
             p.save()
 
 
+def get_coords(address):
+    url = 'http://nominatim.openstreetmap.org/search.php?q=' + address + '+Aarhus&format=json'
+    response = requests.get(url)
+    data = response.json()
+
+    return data[0]['lat'], data[0]['lon']
+
+
 # Henter data fra stadsarkivets api for hvert unikt steds id.
 # Hentede 11036 notes ved første run.
 def get_notes(place):
@@ -46,6 +54,7 @@ def get_notes(place):
     data = response.json()
     note_type = ''
     loaded = 0
+    lat, lon = get_coords(str(place))
 
     # Tjekker om result objektet er tomt.
     try:
@@ -91,6 +100,8 @@ def get_notes(place):
                     note_type=note_type,
                     from_date=datetime.date(int(year), int(month), int(day)),
                     media=media,
+                    lat=lat,
+                    lng=lon,
                     place=place)
         note.save()
         loaded += 1
@@ -102,16 +113,6 @@ def delete_duplicates():
     for row in Note.objects.all():
         if Note.objects.filter(note_id=row.note_id, note_type=row.note_type).count() > 1:
             row.delete()
-
-
-def add_coords():
-    notes = Note.objects.all()
-    for note in notes:
-        response = requests.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + note.place.name + ',+Aarhus,+Danmark')
-        data = response.json()
-        note.lat = data['results'][0]['geometry']['location']['lat']
-        note.lng = data['results'][0]['geometry']['location']['lng']
-        note.save()
 
 
 def add_street(street):

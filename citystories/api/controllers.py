@@ -1,9 +1,13 @@
 import requests
 
 
-def get_address(location):
-    response = requests.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + location)
+def get_address(lat, lon):
+    response = requests.get('http://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json')
     data = response.json()
-    street = data['results'][0]['address_components'][1]['long_name']
-    number = data['results'][0]['address_components'][0]['long_name']
+    street = data['address']['road']
+    # Not all responses has a house_number field.
+    try:
+        number = data['address']['house_number']
+    except KeyError:
+        number = ''
     return street + ' ' + number

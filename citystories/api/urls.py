@@ -12,7 +12,7 @@ router.register(r'users', UserViewSet)
 
 urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url('^notes/(?P<location>.+)/$', NoteView.as_view()),
+    url('^notes/(?P<lat>.+)/(?P<lon>.+)/$', NoteView.as_view()),
     url('^notes/$', NoteMapView.as_view()),
     url('^test-entries/(?P<location>.+)/$', TestEntryViewSet.as_view()),
     url('^test-entries/$', CreateTestEntryViewSet.as_view()),

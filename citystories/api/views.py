@@ -59,8 +59,9 @@ class NoteView(generics.ListAPIView):
     serializer_class = NoteSerializer
 
     def get_queryset(self):
-        location = self.kwargs['location']
-        address = controllers.get_address(location)
+        lat = self.kwargs['lat']
+        lon = self.kwargs['lon']
+        address = controllers.get_address(lat, lon)
         return Note.objects.filter(place__name=address)
 
 

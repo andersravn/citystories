@@ -25,6 +25,7 @@ STATICFILES_DIRS = (
     BASE_DIR.child("assets"),
 )
 
+
 def get_env_variable(var_name):
     """ Get the environment variable or return exception """
     try:

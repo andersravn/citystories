@@ -33,6 +33,17 @@ class TestEntry(models.Model):
         return self.text_content
 
 
+class UserEntry(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True)
+    text_content = models.TextField()
+    pnt = models.PointField(null=True, blank=True, geography=True)
+    objects = models.GeoManager()
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.text_content
+
+
 class Place(models.Model):
     placeid = models.IntegerField()
     name = models.CharField(max_length=55)
@@ -53,7 +64,9 @@ class Note(models.Model):
     lat = models.CharField(max_length=12, default='none')
     lng = models.CharField(max_length=12, default='none')
     place = models.ForeignKey(Place)
+    rating = models.IntegerField(default=1)
     created = models.DateTimeField(auto_now_add=True)
+    last_changed = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.place.name + ' | ' + str(self.from_date)

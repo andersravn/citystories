@@ -41,7 +41,7 @@ class TestEntryViewSet(generics.ListAPIView):
     def get_queryset(self):
         location = self.kwargs['location']
         pnt = fromstr('POINT(' + location + ')', srid=4326)
-        return TestEntry.objects.filter(pnt__distance_lte=(pnt, 10))
+        return TestEntry.objects.filter(pnt__distance_lte=(pnt, 25))
 
 
 class CreateTestEntryViewSet(generics.ListCreateAPIView):
@@ -55,16 +55,27 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class NoteView(generics.ListAPIView):
-    queryset = Note.objects.all()
+    queryset = Note.objects.filter()
     serializer_class = NoteSerializer
 
     def get_queryset(self):
         lat = self.kwargs['lat']
         lon = self.kwargs['lon']
         address = controllers.get_address(lat, lon)
-        return Note.objects.filter(place__name=address)
+        return Note.objects.filter(place__name=address, no_good=False)
 
 
 class NoteMapView(generics.ListAPIView):
+    queryset = Note.objects.filter(no_good=False)
+    serializer_class = NoteSerializer
+
+
+class ReportNoteView(generics.ListAPIView):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+
+    def get_queryset(self):
+        note_id = self.kwargs['note_id']
+        note = Note.objects.get(pk=note_id)
+        note.no_good = True
+        note.save()

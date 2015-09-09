@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.gis.geos import fromstr
 
 from rest_framework import permissions, viewsets, generics
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from api import controllers
 
@@ -62,7 +64,7 @@ class NoteView(generics.ListAPIView):
         lat = self.kwargs['lat']
         lon = self.kwargs['lon']
         address = controllers.get_address(lat, lon)
-        return Note.objects.filter(place__name=address, no_good=False)
+        return Note.objects.filter(place__name=address, no_good=False).order_by('-rating')
 
 
 class NoteMapView(generics.ListAPIView):
@@ -70,12 +72,31 @@ class NoteMapView(generics.ListAPIView):
     serializer_class = NoteSerializer
 
 
-class ReportNoteView(generics.ListAPIView):
-    queryset = Note.objects.all()
-    serializer_class = NoteSerializer
+@api_view(['POST'])
+def upvote_note(request, note_id):
+    if request.method == 'POST':
+        note = Note.objects.get(pk=note_id)
+        note.rating += 1
+        note.save()
+        return Response({"message": "Upvoted!"})
+    return Response({"message": "Can not compute..."})
 
-    def get_queryset(self):
-        note_id = self.kwargs['note_id']
+
+@api_view(['POST'])
+def downvote_note(request, note_id):
+    if request.method == 'POST':
+        note = Note.objects.get(pk=note_id)
+        note.rating -= 1
+        note.save()
+        return Response({"message": "Downvoted!"})
+    return Response({"message": "Can not compute..."})
+
+
+@api_view(['POST'])
+def report_note(request, note_id):
+    if request.method == 'POST':
         note = Note.objects.get(pk=note_id)
         note.no_good = True
         note.save()
+        return Response({"message": "Reported!"})
+    return Response({"message": "Can not compute..."})

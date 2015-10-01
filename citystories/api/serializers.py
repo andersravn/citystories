@@ -1,26 +1,13 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from api.models import Entry, Note, TestEntry
+from api.models import Note, UserEntry
 
 
-class EntrySerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
-
+class UserEntrySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Entry
-        fields = ('content', 'user', 'created')
-
-    def validate_content(self, value):
-        if ' ' in value:
-            raise serializers.ValidationError('That was more than one word!')
-        return value
-
-
-class TestEntrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TestEntry
-        fields = ('id', 'text_content', 'lat', 'long', 'pnt')
+        model = UserEntry
+        fields = ('id', 'text_content', 'rating', 'lat', 'lng', 'pnt', 'created')
 
 
 class UserSerializer(serializers.ModelSerializer):

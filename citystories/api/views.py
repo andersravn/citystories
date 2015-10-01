@@ -14,8 +14,8 @@ from rest_framework.response import Response
 from api import controllers
 
 from .permissions import IsAuthorOrReadOnly
-from .serializers import EntrySerializer, UserSerializer, NoteSerializer, TestEntrySerializer
-from .models import Entry, Note, TestEntry
+from .serializers import UserSerializer, NoteSerializer, UserEntrySerializer
+from .models import Note, UserEntry
 
 
 def front_view(request):
@@ -26,29 +26,21 @@ def front_view(request):
         return render(request, template_name, context)
 
 
-class EntryViewSet(viewsets.ModelViewSet):
-    queryset = Entry.objects.all()
-    serializer_class = EntrySerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          IsAuthorOrReadOnly)
-
-    def pre_save(self, obj):
-        obj.user = self.request.user
-
-
-class TestEntryViewSet(generics.ListAPIView):
-    queryset = TestEntry.objects.all()
-    serializer_class = TestEntrySerializer
+# USER ENTRIES
+class UserEntryViewSet(generics.ListAPIView):
+    queryset = UserEntry.objects.all()
+    serializer_class = UserEntrySerializer
 
     def get_queryset(self):
         location = self.kwargs['location']
         pnt = fromstr('POINT(' + location + ')', srid=4326)
-        return TestEntry.objects.filter(pnt__distance_lte=(pnt, 25))
+        return UserEntry.objects.filter(pnt__distance_lte=(pnt, 25))
 
 
-class CreateTestEntryViewSet(generics.ListCreateAPIView):
-    queryset = TestEntry.objects.all()
-    serializer_class = TestEntrySerializer
+# For the map view, that needs all entries.
+class CreateUserEntryViewSet(generics.ListCreateAPIView):
+    queryset = UserEntry.objects.all()
+    serializer_class = UserEntrySerializer
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -56,6 +48,37 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
 
 
+@api_view(['POST'])
+def upvote_userentry(request, note_id):
+    if request.method == 'POST':
+        note = UserEntry.objects.get(pk=note_id)
+        note.rating += 1
+        note.save()
+        return Response({"message": "Upvoted!"})
+    return Response({"message": "Can not compute..."})
+
+
+@api_view(['POST'])
+def downvote_userentry(request, note_id):
+    if request.method == 'POST':
+        note = UserEntry.objects.get(pk=note_id)
+        note.rating -= 1
+        note.save()
+        return Response({"message": "Downvoted!"})
+    return Response({"message": "Can not compute..."})
+
+
+@api_view(['POST'])
+def report_userentry(request, note_id):
+    if request.method == 'POST':
+        note = UserEntry.objects.get(pk=note_id)
+        note.no_good = True
+        note.save()
+        return Response({"message": "Reported!"})
+    return Response({"message": "Can not compute..."})
+
+
+# NOTES #
 class NoteView(generics.ListAPIView):
     queryset = Note.objects.filter()
     serializer_class = NoteSerializer

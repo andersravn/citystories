@@ -36,7 +36,11 @@ class TestEntry(models.Model):
 class UserEntry(models.Model):
     user = models.ForeignKey(User, null=True, blank=True)
     text_content = models.TextField()
+    rating = models.IntegerField(default=1)
+    lat = models.CharField(max_length=20, null=True, blank=True)
+    lng = models.CharField(max_length=20, null=True, blank=True)
     pnt = models.PointField(null=True, blank=True, geography=True)
+    no_good = models.BooleanField(default=False)
     objects = models.GeoManager()
     created = models.DateTimeField(auto_now_add=True)
 

@@ -2,11 +2,11 @@
  # -*- coding: utf-8 -*-
 
 from django.contrib.gis import admin
-from api.models import Entry, Place, Note, TestEntry
+from api.models import Entry, Place, Note, TestEntry, UserEntry
 
 # Register your models here.
 
-admin.site.register(Entry)
 admin.site.register(Place)
 admin.site.register(Note)
+admin.site.register(UserEntry, admin.GeoModelAdmin)
 admin.site.register(TestEntry, admin.GeoModelAdmin)

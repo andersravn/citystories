@@ -27,55 +27,20 @@ def front_view(request):
 
 
 # USER ENTRIES
-class UserEntryViewSet(generics.ListAPIView):
+class UserEntryView(generics.ListAPIView):
     queryset = UserEntry.objects.all()
     serializer_class = UserEntrySerializer
 
     def get_queryset(self):
         location = self.kwargs['location']
         pnt = fromstr('POINT(' + location + ')', srid=4326)
-        return UserEntry.objects.filter(pnt__distance_lte=(pnt, 25))
+        return UserEntry.objects.filter(no_good=False, pnt__distance_lte=(pnt, 25))
 
 
 # For the map view, that needs all entries.
 class CreateUserEntryViewSet(generics.ListCreateAPIView):
-    queryset = UserEntry.objects.all()
+    queryset = UserEntry.objects.filter(no_good=False)
     serializer_class = UserEntrySerializer
-
-
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-@api_view(['POST'])
-def upvote_userentry(request, note_id):
-    if request.method == 'POST':
-        note = UserEntry.objects.get(pk=note_id)
-        note.rating += 1
-        note.save()
-        return Response({"message": "Upvoted!"})
-    return Response({"message": "Can not compute..."})
-
-
-@api_view(['POST'])
-def downvote_userentry(request, note_id):
-    if request.method == 'POST':
-        note = UserEntry.objects.get(pk=note_id)
-        note.rating -= 1
-        note.save()
-        return Response({"message": "Downvoted!"})
-    return Response({"message": "Can not compute..."})
-
-
-@api_view(['POST'])
-def report_userentry(request, note_id):
-    if request.method == 'POST':
-        note = UserEntry.objects.get(pk=note_id)
-        note.no_good = True
-        note.save()
-        return Response({"message": "Reported!"})
-    return Response({"message": "Can not compute..."})
 
 
 # NOTES #
@@ -90,36 +55,58 @@ class NoteView(generics.ListAPIView):
         return Note.objects.filter(place__name=address, no_good=False).order_by('-rating')
 
 
+# For the map view, that needs all entries
 class NoteMapView(generics.ListAPIView):
     queryset = Note.objects.filter(no_good=False)
     serializer_class = NoteSerializer
 
 
 @api_view(['POST'])
-def upvote_note(request, note_id):
+def upvote(request, info):
     if request.method == 'POST':
-        note = Note.objects.get(pk=note_id)
-        note.rating += 1
-        note.save()
+        # info from the request is 'uuid,type'
+        info = info.split(',')
+        if info[1] == 'note':
+            note = Note.objects.get(pk=info[0])
+            note.rating += 1
+            note.save()
+        if info[1] == 'userentry':
+            userentry = UserEntry.objects.get(pk=info[0])
+            userentry.rating += 1
+            userentry.save()
         return Response({"message": "Upvoted!"})
     return Response({"message": "Can not compute..."})
 
 
 @api_view(['POST'])
-def downvote_note(request, note_id):
+def downvote(request, info):
     if request.method == 'POST':
-        note = Note.objects.get(pk=note_id)
-        note.rating -= 1
-        note.save()
+        # info from the request is 'uuid,type'
+        info = info.split(',')
+        if info[1] == 'note':
+            note = Note.objects.get(pk=info[0])
+            note.rating -= 1
+            note.save()
+        if info[1] == 'userentry':
+            userentry = UserEntry.objects.get(pk=info[0])
+            userentry.rating -= 1
+            userentry.save()
         return Response({"message": "Downvoted!"})
     return Response({"message": "Can not compute..."})
 
 
 @api_view(['POST'])
-def report_note(request, note_id):
+def report(request, info):
     if request.method == 'POST':
-        note = Note.objects.get(pk=note_id)
-        note.no_good = True
-        note.save()
+        # info from the request is 'uuid,type'
+        info = info.split(',')
+        if info[1] == 'note':
+            note = Note.objects.get(pk=info[0])
+            note.no_good = True
+            note.save()
+        if info[1] == 'userentry':
+            userentry = UserEntry.objects.get(pk=info[0])
+            userentry.no_good = True
+            userentry.save()
         return Response({"message": "Reported!"})
     return Response({"message": "Can not compute..."})

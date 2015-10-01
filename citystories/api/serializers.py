@@ -7,7 +7,7 @@ from api.models import Note, UserEntry
 class UserEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserEntry
-        fields = ('id', 'text_content', 'rating', 'lat', 'lng', 'pnt', 'created')
+        fields = ('uuid', 'type', 'text_content', 'rating', 'lat', 'lng', 'pnt', 'created')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -21,4 +21,4 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ('id', 'text_content', 'from_date', 'lat', 'lng', 'place', 'rating')
+        fields = ('uuid', 'type', 'text_content', 'from_date', 'lat', 'lng', 'place', 'rating')

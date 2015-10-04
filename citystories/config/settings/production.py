@@ -12,7 +12,8 @@ DEBUG = False
 ALLOWED_HOSTS = ['.citystories.dk']
 
 CORS_ORIGIN_WHITELIST = (
-    'citystories.dk'
+    'citystories.dk',
+    'localhost'
 )
 
 DATABASES = {

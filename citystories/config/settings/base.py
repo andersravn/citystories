@@ -78,10 +78,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-CORS_ORIGIN_WHITELIST = (
-    'citystories.dk'
-)
-
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

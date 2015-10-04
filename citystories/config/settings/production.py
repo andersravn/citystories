@@ -11,6 +11,10 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['.citystories.dk']
 
+CORS_ORIGIN_WHITELIST = (
+    'citystories.dk'
+)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',

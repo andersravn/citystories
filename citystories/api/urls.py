@@ -4,7 +4,7 @@
 from django.conf.urls import include, url
 from rest_framework import routers
 
-from .views import NoteView, NoteMapView, UserEntryView, CreateUserEntryViewSet
+from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet
 import api.views
 
 router = routers.DefaultRouter()
@@ -18,6 +18,7 @@ urlpatterns = [
     url('^notes/$', NoteMapView.as_view()),
     url('^userentries/(?P<location>.+)/$', UserEntryView.as_view()),
     url('^userentries/$', CreateUserEntryViewSet.as_view()),
+    url('^dfifilm/$', DfiFilmView.as_view()),
 ]
 
 urlpatterns += router.urls

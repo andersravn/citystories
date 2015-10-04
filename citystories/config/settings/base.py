@@ -78,6 +78,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

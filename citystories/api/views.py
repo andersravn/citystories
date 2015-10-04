@@ -14,8 +14,8 @@ from rest_framework.response import Response
 from api import controllers
 
 from .permissions import IsAuthorOrReadOnly
-from .serializers import UserSerializer, NoteSerializer, UserEntrySerializer
-from .models import Note, UserEntry
+from .serializers import UserSerializer, UserEntrySerializer, NoteSerializer, DfiFilmSerializer
+from .models import UserEntry, Note, DfiFilm
 
 
 def front_view(request):
@@ -45,7 +45,7 @@ class CreateUserEntryViewSet(generics.ListCreateAPIView):
 
 # NOTES #
 class NoteView(generics.ListAPIView):
-    queryset = Note.objects.filter()
+    queryset = Note.objects.all()
     serializer_class = NoteSerializer
 
     def get_queryset(self):
@@ -59,6 +59,12 @@ class NoteView(generics.ListAPIView):
 class NoteMapView(generics.ListAPIView):
     queryset = Note.objects.filter(no_good=False)
     serializer_class = NoteSerializer
+
+
+# DFI FILM #
+class DfiFilmView(generics.ListAPIView):
+    queryset = DfiFilm.objects.all()
+    serializer_class = DfiFilmSerializer
 
 
 @api_view(['POST'])

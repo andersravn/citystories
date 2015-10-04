@@ -83,5 +83,21 @@ class Note(models.Model):
         return self.place.name + ' | ' + str(self.from_date)
 
 
+class DfiFilm(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    type = models.CharField(max_length=4, default='film', editable=False)
+    title = models.CharField(max_length=100)
+    text_content = models.TextField()
+    rating = models.IntegerField(default=1)
+    duration = models.IntegerField(blank=True)
+    embed = models.TextField()
+    lat = models.CharField(max_length=12, default='none')
+    long = models.CharField(max_length=12, default='none')
+    date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+
 class LatestPlace(models.Model):
     placeid = models.IntegerField()

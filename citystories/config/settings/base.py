@@ -53,12 +53,6 @@ INSTALLED_APPS = (
     'pygments',
     'snippets',
     'rest_framework.authtoken',
-    'rest_auth',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.facebook',
-    'rest_auth.registration',
     'corsheaders',
     'api',
     'dashboard',
@@ -97,13 +91,16 @@ TEMPLATES = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = (
-    # Needed to login by username in Django admin, regardless of `allauth`
-    'django.contrib.auth.backends.ModelBackend',
-
-    # `allauth` specific authentication methods, such as login by e-mail
-    'allauth.account.auth_backends.AuthenticationBackend',
-)
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    )
+}
 
 WSGI_APPLICATION = 'config.wsgi.application'
 

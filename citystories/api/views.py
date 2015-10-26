@@ -5,16 +5,18 @@ from django.shortcuts import render, render_to_response, redirect
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.contrib.gis.geos import fromstr
 
 from rest_framework import permissions, viewsets, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
-from api import controllers
+from api import utils
 
-from .permissions import IsAuthorOrReadOnly
-from .serializers import UserSerializer, UserEntrySerializer, NoteSerializer, DfiFilmSerializer
+from .permissions import IsAuthorOrReadOnly, IsStaffOrTargetUser
+from .serializers import UserSerializer, UserEntrySerializer, NoteSerializer, DfiFilmSerializer, Feedback
 from .models import UserEntry, Note, DfiFilm
 
 
@@ -37,10 +39,13 @@ class UserEntryView(generics.ListAPIView):
         return UserEntry.objects.filter(no_good=False, pnt__distance_lte=(pnt, 25))
 
 
-# For the map view, that needs all entries.
+# For the map view, that needs all entries and entry creation.
 class CreateUserEntryViewSet(generics.ListCreateAPIView):
     queryset = UserEntry.objects.filter(no_good=False)
     serializer_class = UserEntrySerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 # NOTES #
@@ -51,7 +56,7 @@ class NoteView(generics.ListAPIView):
     def get_queryset(self):
         lat = self.kwargs['lat']
         lon = self.kwargs['lon']
-        address = controllers.get_address(lat, lon)
+        address = utils.get_address(lat, lon)
         return Note.objects.filter(place__name=address, no_good=False).order_by('-rating')
 
 
@@ -116,3 +121,11 @@ def report(request, info):
             userentry.save()
         return Response({"message": "Reported!"})
     return Response({"message": "Can not compute..."})
+
+
+def feedback_view(request):
+    if request.method == 'POST':
+        text_content = request.POST.get('text_content')
+        email = request.POST.get('email')
+        feedback = Feedback(text_content=text_content, email=email)
+        feedback.save()

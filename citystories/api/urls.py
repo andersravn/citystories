@@ -3,14 +3,15 @@
 
 from django.conf.urls import include, url
 from rest_framework import routers
+from rest_framework.authtoken import views
 
 from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet
-import api.views
 
 router = routers.DefaultRouter()
 
 urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-token-auth/', views.obtain_auth_token),
     url('^vote/up/(?P<info>.+)/', 'api.views.upvote', name='upvote'),
     url('^vote/down/(?P<info>.+)/', 'api.views.downvote', name='downvote'),
     url('^report/(?P<info>.+)/', 'api.views.report', name='report'),
@@ -19,6 +20,7 @@ urlpatterns = [
     url('^userentries/(?P<location>.+)/$', UserEntryView.as_view()),
     url('^userentries/$', CreateUserEntryViewSet.as_view()),
     url('^dfifilm/$', DfiFilmView.as_view()),
+    url('^feedback/$', 'api.views.feedback_view', name='feedback'),
 ]
 
 urlpatterns += router.urls

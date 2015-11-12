@@ -5,7 +5,7 @@ from django.conf.urls import include, url
 from rest_framework import routers
 from rest_framework.authtoken import views
 
-from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet
+from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet, RESTView
 
 router = routers.DefaultRouter()
 
@@ -15,12 +15,13 @@ urlpatterns = [
     url('^vote/up/(?P<info>.+)/', 'api.views.upvote', name='upvote'),
     url('^vote/down/(?P<info>.+)/', 'api.views.downvote', name='downvote'),
     url('^report/(?P<info>.+)/', 'api.views.report', name='report'),
-    url('^notes/(?P<lat>.+)/(?P<lon>.+)/$', NoteView.as_view()),
+    url('^notes/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', NoteView.as_view()),
     url('^notes/$', NoteMapView.as_view()),
-    url('^userentries/(?P<location>.+)/$', UserEntryView.as_view()),
+    url('^userentries/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', UserEntryView.as_view()),
     url('^userentries/$', CreateUserEntryViewSet.as_view()),
     url('^dfifilm/$', DfiFilmView.as_view()),
     url('^feedback/$', 'api.views.feedback_view', name='feedback'),
+    url(r'^resources/$', RESTView.as_view(), name='resources'),
 ]
 
 urlpatterns += router.urls

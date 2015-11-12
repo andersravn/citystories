@@ -1,22 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from itertools import chain
+
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import fromstr
+from django.core import serializers
 
 from rest_framework import permissions, viewsets, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 from api import utils
 
 from .permissions import IsAuthorOrReadOnly, IsStaffOrTargetUser
-from .serializers import UserSerializer, UserEntrySerializer, NoteSerializer, DfiFilmSerializer, Feedback
+from .serializers import UserEntrySerializer, NoteSerializer, DfiFilmSerializer, Feedback
 from .models import UserEntry, Note, DfiFilm
 
 
@@ -34,9 +39,19 @@ class UserEntryView(generics.ListAPIView):
     serializer_class = UserEntrySerializer
 
     def get_queryset(self):
-        location = self.kwargs['location']
-        pnt = fromstr('POINT(' + location + ')', srid=4326)
-        return UserEntry.objects.filter(no_good=False, pnt__distance_lte=(pnt, 25))
+        lat = self.kwargs['lat']
+        lon = self.kwargs['lon']
+        distance = self.kwargs['distance']
+        pnt = fromstr('POINT(' + lon + ' ' + lat + ')', srid=4326)
+        return UserEntry.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance)))
+
+
+class RESTView(APIView):
+    def get(self, request):
+        result_list = list(chain(UserEntry.objects.all(), Note.objects.all()))
+
+        response = Response(serializers.serialize('json', result_list), status=status.HTTP_200_OK)
+        return response
 
 
 # For the map view, that needs all entries and entry creation.
@@ -56,8 +71,9 @@ class NoteView(generics.ListAPIView):
     def get_queryset(self):
         lat = self.kwargs['lat']
         lon = self.kwargs['lon']
-        address = utils.get_address(lat, lon)
-        return Note.objects.filter(place__name=address, no_good=False).order_by('-rating')
+        distance = self.kwargs['distance']
+        pnt = fromstr('POINT(' + lon + ' ' + lat + ')', srid=4326)
+        return Note.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))).order_by('-rating')
 
 
 # For the map view, that needs all entries

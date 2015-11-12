@@ -18,10 +18,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class NoteSerializer(serializers.ModelSerializer):
     place = serializers.StringRelatedField()
+    userentries = UserEntrySerializer(many=True, read_only=True)
 
     class Meta:
         model = Note
-        fields = ('uuid', 'type', 'text_content', 'from_date', 'lat', 'lng', 'place', 'rating')
+        fields = ('uuid', 'type', 'text_content', 'from_date', 'lat', 'lng', 'place', 'rating', 'userentries')
 
 
 class DfiFilmSerializer(serializers.ModelSerializer):

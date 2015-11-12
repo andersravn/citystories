@@ -3,7 +3,7 @@
 
 import csv, os, datetime, requests
 
-from django.db import DataError
+from django.contrib.gis.geos import fromstr
 
 from api.models import Place, Note
 
@@ -95,6 +95,8 @@ def get_notes(place):
         if analog_content is not 'none':
             analog_content = r['analog_content']['storage_id']
 
+        pnt = fromstr('POINT(' + lon + ' ' + lat + ')', srid=4326)
+
         note = Note(note_id=analog_content,
                     text_content=r['description']['textcontent'],
                     note_type=note_type,
@@ -102,6 +104,7 @@ def get_notes(place):
                     media=media,
                     lat=lat,
                     lng=lon,
+                    pnt=pnt,
                     place=place)
         note.save()
         loaded += 1
@@ -124,3 +127,11 @@ def add_street(street):
         place.notes_loaded = True  # notes_loaded indikerer nu om der loaded koordinater på sedler knytter til et placeid
         place.save()
     return loaded
+
+
+def add_pnt_fields():
+    notes = Note.objects.all()
+    for note in notes:
+        pnt = fromstr('POINT(' + note.lng + ' ' + note.lat + ')', srid=4326)
+        note.pnt = pnt
+        note.save()

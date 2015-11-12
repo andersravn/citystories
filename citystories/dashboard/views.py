@@ -65,6 +65,14 @@ def load_csv(request):
         return redirect('/dash/scripts/')
 
 
+def add_pnt_fields(request):
+    if request.method == 'GET':
+        scripts.add_pnt_fields() # Tilføjer pnt felter til alle Note objekter i databasen.
+
+        messages.success(request, 'pnt felter er tilføjet')
+        return redirect('/dash/scripts/')
+
+
 def login_view(request):
     logout(request)
     context = {}

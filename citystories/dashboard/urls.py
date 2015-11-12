@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^scripts/', views.scripts_view, name='note_scripts'),
     url(r'^load-csv/', views.load_csv, name='load_csv'),
     url(r'^stadsarkiv-api/', views.stadsarkiv_api, name='stadsarkiv_api'),
+    url(r'^addpntfields/', views.add_pnt_fields, name='addpntfields'),
     url(r'^login/', views.login_view, name='login'),
     url(r'^auth/', views.auth_view, name='auth_dash'),
     url(r'^logout/', views.logout_view, name='dash_logout'),

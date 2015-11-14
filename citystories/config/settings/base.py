@@ -57,6 +57,7 @@ INSTALLED_APPS = (
     'allauth',
     'allauth.account',
     'rest_auth.registration',
+    'drf_multiple_model',
     'corsheaders',
     'api',
     'dashboard',

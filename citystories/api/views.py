@@ -17,11 +17,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
+from drf_multiple_model.views import MultipleModelAPIView
 
 from api import utils
 
 from .permissions import IsAuthorOrReadOnly, IsStaffOrTargetUser
-from .serializers import UserEntrySerializer, NoteSerializer, DfiFilmSerializer, Feedback
+from .serializers import UserEntrySerializer, LimitedUserEntrySerializer, NoteSerializer, LimitedNoteSerializer, \
+    DfiFilmSerializer, Feedback
 from .models import UserEntry, Note, DfiFilm
 
 
@@ -32,6 +34,39 @@ def front_view(request):
     if request.method == 'GET':
         return render(request, template_name, context)
 
+
+class AllDataLessThanView(MultipleModelAPIView):
+    flat = True
+    sorting_field = 'rating'
+
+    def get_queryList(self):
+        lat = self.kwargs['lat']
+        lon = self.kwargs['lon']
+        distance = self.kwargs['distance']
+        pnt = fromstr('POINT(' + lon + ' ' + lat + ')', srid=4326)
+
+        queryList = [
+            (UserEntry.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))), UserEntrySerializer),
+            (Note.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))), NoteSerializer),
+        ]
+        return queryList
+
+
+class AllDataGreaterThanView(MultipleModelAPIView):
+    flat = True
+    sorting_field = 'rating'
+
+    def get_queryList(self):
+        lat = self.kwargs['lat']
+        lon = self.kwargs['lon']
+        distance = self.kwargs['distance']
+        pnt = fromstr('POINT(' + lon + ' ' + lat + ')', srid=4326)
+
+        queryList = [
+            (UserEntry.objects.filter(no_good=False, pnt__distance_gt=(pnt, int(distance))), LimitedUserEntrySerializer),
+            (Note.objects.filter(no_good=False, pnt__distance_gt=(pnt, int(distance))), LimitedNoteSerializer),
+        ]
+        return queryList
 
 # USER ENTRIES
 class UserEntryView(generics.ListAPIView):

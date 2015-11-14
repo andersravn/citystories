@@ -10,6 +10,13 @@ class UserEntrySerializer(serializers.ModelSerializer):
         fields = ('uuid', 'type', 'user', 'text_content', 'rating', 'lat', 'lng', 'pnt', 'created')
 
 
+class LimitedUserEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserEntry
+        fields = ('uuid', 'type', 'rating', 'lat', 'lng', 'created')
+        read_only_fields = ('uuid', 'type', 'rating', 'lat', 'lng', 'created')
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -18,11 +25,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 class NoteSerializer(serializers.ModelSerializer):
     place = serializers.StringRelatedField()
-    userentries = UserEntrySerializer(many=True, read_only=True)
 
     class Meta:
         model = Note
-        fields = ('uuid', 'type', 'text_content', 'from_date', 'lat', 'lng', 'place', 'rating', 'userentries')
+        fields = ('uuid', 'type', 'text_content', 'from_date', 'lat', 'lng', 'place', 'rating')
+        read_only_fields = ('uuid', 'type', 'text_content', 'from_date', 'lat', 'lng', 'place', 'rating')
+
+
+class LimitedNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ('uuid', 'type', 'lat', 'lng', 'rating')
+        read_only_fields = ('uuid', 'type', 'lat', 'lng', 'rating')
 
 
 class DfiFilmSerializer(serializers.ModelSerializer):

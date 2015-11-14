@@ -5,7 +5,8 @@ from django.conf.urls import include, url
 from rest_framework import routers
 from rest_framework.authtoken import views
 
-from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet, RESTView
+from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet, RESTView, \
+    AllDataLessThanView, AllDataGreaterThanView
 
 router = routers.DefaultRouter()
 
@@ -19,6 +20,8 @@ urlpatterns = [
     url('^notes/$', NoteMapView.as_view()),
     url('^userentries/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', UserEntryView.as_view()),
     url('^userentries/$', CreateUserEntryViewSet.as_view()),
+    url('^alldatalessthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', AllDataLessThanView.as_view()),
+    url('^alldatagreaterthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', AllDataGreaterThanView.as_view()),
     url('^dfifilm/$', DfiFilmView.as_view()),
     url('^feedback/$', 'api.views.feedback_view', name='feedback'),
     url(r'^resources/$', RESTView.as_view(), name='resources'),

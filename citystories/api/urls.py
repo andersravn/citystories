@@ -5,8 +5,8 @@ from django.conf.urls import include, url
 from rest_framework import routers
 from rest_framework.authtoken import views
 
-from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet, RESTView, \
-    AllDataLessThanView, AllDataGreaterThanView
+from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet, AllDataLessThanView, \
+    AllDataGreaterThanView
 
 router = routers.DefaultRouter()
 

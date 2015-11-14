@@ -81,14 +81,6 @@ class UserEntryView(generics.ListAPIView):
         return UserEntry.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance)))
 
 
-class RESTView(APIView):
-    def get(self, request):
-        result_list = list(chain(UserEntry.objects.all(), Note.objects.all()))
-
-        response = Response(serializers.serialize('json', result_list), status=status.HTTP_200_OK)
-        return response
-
-
 # For the map view, that needs all entries and entry creation.
 class CreateUserEntryViewSet(generics.ListCreateAPIView):
     queryset = UserEntry.objects.filter(no_good=False)

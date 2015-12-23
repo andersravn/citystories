@@ -23,7 +23,6 @@ urlpatterns = [
     url('^alldatalessthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', AllDataLessThanView.as_view()),
     url('^alldatagreaterthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', AllDataGreaterThanView.as_view()),
     url('^dfifilm/$', DfiFilmView.as_view()),
-    url('^feedback/$', 'api.views.feedback_view', name='feedback'),
 ]
 
 urlpatterns += router.urls

@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import fromstr
 from django.core import serializers
+from django.core.exceptions import MultipleObjectsReturned
 
 from rest_framework import permissions, viewsets, generics
 from rest_framework.decorators import api_view
@@ -23,8 +24,8 @@ from api import utils
 
 from .permissions import IsAuthorOrReadOnly, IsStaffOrTargetUser
 from .serializers import UserEntrySerializer, LimitedUserEntrySerializer, NoteSerializer, LimitedNoteSerializer, \
-    DfiFilmSerializer, Feedback
-from .models import UserEntry, Note, DfiFilm
+    DfiFilmSerializer
+from .models import UserEntry, Note, DfiFilm, NoteVote, UserentryVote
 
 
 def front_view(request):
@@ -120,15 +121,48 @@ def upvote(request, info):
     if request.method == 'POST':
         # info from the request is 'uuid,type'
         info = info.split(',')
+
+        # NOTE UPVOTE
         if info[1] == 'note':
             note = Note.objects.get(pk=info[0])
-            note.rating += 1
-            note.save()
+            try:  # Try to find existing vote for the given note
+                notevote = NoteVote.objects.get(user=request.user, note=note)
+                if notevote.value == -1:  # If previous vote was negative
+                    note.rating += 1  # Add one positive vote
+                    note.save()
+                    notevote.value = 1  # Change the vote to a positive one
+                    notevote.save()
+                    return Response({"message": "upvoted"})
+            except NoteVote.DoesNotExist:  # If no existing vote is found
+                note.rating += 1
+                note.save()
+                notevote = NoteVote(user=request.user, note=note, value=1)  # Create the new vote
+                notevote.save()
+                return Response({"message": "upvoted"})
+            except MultipleObjectsReturned:  # If there for some reason is more than one vote with the same user and note
+                return Response({"message": "already_voted"})
+            return Response({"message": "already_voted"})
+
+        # USERENTRY UPVOTE
         if info[1] == 'userentry':
             userentry = UserEntry.objects.get(pk=info[0])
-            userentry.rating += 1
-            userentry.save()
-        return Response({"message": "Upvoted!"})
+            try:
+                userentryvote = UserentryVote.objects.get(user=request.user, userentry=userentry)
+                if userentryvote.value == -1:  # If previous vote was negative
+                    userentry.rating += 1  # Add one positive vote
+                    userentry.save()
+                    userentryvote.value = 1  # Change the vote to a positive one
+                    userentryvote.save()
+                    return Response({"message": "upvoted"})
+            except UserentryVote.DoesNotExist:  # If no existing vote is found
+                userentry.rating += 1
+                userentry.save()
+                userentryvote = UserentryVote(user=request.user, userentry=userentry, value=1)  # Create the new vote
+                userentryvote.save()
+                return Response({"message": "upvoted"})
+            except MultipleObjectsReturned:  # If there for some reason is more than one vote with the same user and note
+                return Response({"message": "already_voted"})
+            return Response({"message": "already_voted"})
     return Response({"message": "Can not compute..."})
 
 
@@ -137,15 +171,48 @@ def downvote(request, info):
     if request.method == 'POST':
         # info from the request is 'uuid,type'
         info = info.split(',')
+
+        # NOTE DOWNVOTE
         if info[1] == 'note':
             note = Note.objects.get(pk=info[0])
-            note.rating -= 1
-            note.save()
+            try:  # Try to find existing vote for the given note
+                notevote = NoteVote.objects.get(user=request.user, note=note)
+                if notevote.value == 1:  # If previous vote was positive
+                    note.rating -= 1  # Add one negative vote
+                    note.save()
+                    notevote.value = -1  # Change the vote to a negative one
+                    notevote.save()
+                    return Response({"message": "downvoted"})
+            except NoteVote.DoesNotExist:  # If no existing vote is found
+                note.rating -= 1
+                note.save()
+                notevote = NoteVote(user=request.user, note=note, value=-1)  # Create the new vote
+                notevote.save()
+                return Response({"message": "downvoted"})
+            except MultipleObjectsReturned:  # If there for some reason is more than one vote with the same user and note
+                return Response({"message": "already_voted"})
+            return Response({"message": "already_voted"})
+
+        # USERENTRY DOWNVOTE
         if info[1] == 'userentry':
             userentry = UserEntry.objects.get(pk=info[0])
-            userentry.rating -= 1
-            userentry.save()
-        return Response({"message": "Downvoted!"})
+            try:
+                userentryvote = UserentryVote.objects.get(user=request.user, userentry=userentry)
+                if userentryvote.value == 1:  # If previous vote was positive
+                    userentry.rating -= 1  # Add one negative vote
+                    userentry.save()
+                    userentryvote.value = -1  # Change the vote to a negative one
+                    userentryvote.save()
+                    return Response({"message": "downvoted"})
+            except UserentryVote.DoesNotExist:  # If no existing vote is found
+                userentry.rating -= 1
+                userentry.save()
+                userentryvote = UserentryVote(user=request.user, userentry=userentry, value=-1)  # Create the new vote
+                userentryvote.save()
+                return Response({"message": "downvoted"})
+            except MultipleObjectsReturned:  # If there for some reason is more than one vote with the same user and note
+                return Response({"message": "already_voted"})
+            return Response({"message": "already_voted"})
     return Response({"message": "Can not compute..."})
 
 
@@ -164,11 +231,3 @@ def report(request, info):
             userentry.save()
         return Response({"message": "Reported!"})
     return Response({"message": "Can not compute..."})
-
-
-def feedback_view(request):
-    if request.method == 'POST':
-        text_content = request.POST.get('text_content')
-        email = request.POST.get('email')
-        feedback = Feedback(text_content=text_content, email=email)
-        feedback.save()

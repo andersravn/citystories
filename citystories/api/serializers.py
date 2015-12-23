@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from api.models import UserEntry, Note, DfiFilm, Feedback
+from api.models import UserEntry, Note, DfiFilm
 
 
 class UserEntrySerializer(serializers.ModelSerializer):
@@ -43,9 +43,3 @@ class DfiFilmSerializer(serializers.ModelSerializer):
     class Meta:
         model = DfiFilm
         fields = ('uuid', 'type', 'title', 'text_content', 'rating', 'duration', 'embed', 'lat', 'long', 'date')
-
-
-class FeedbackSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Feedback
-        fields = ('text_content', 'email')

@@ -102,16 +102,22 @@ class DfiFilm(models.Model):
         return self.title
 
 
+class NoteVote(models.Model):
+    user = models.ForeignKey(User)
+    note = models.ForeignKey(Note)
+    value = models.SmallIntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+
+
+class UserentryVote(models.Model):
+    user = models.ForeignKey(User)
+    userentry = models.ForeignKey(UserEntry)
+    value = models.SmallIntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+
+
 class LatestPlace(models.Model):
     placeid = models.IntegerField()
-
-
-class Feedback(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    text_content = models.TextField()
-    email = models.CharField(max_length=50)
-    user = models.ForeignKey(User, null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

@@ -9,6 +9,8 @@ DEBUG = False
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+GEOS_LIBRARY_PATH = '/usr/local/lib/libgeos_c.so'
+
 ALLOWED_HOSTS = ['.citystories.dk']
 
 CORS_ORIGIN_WHITELIST = (

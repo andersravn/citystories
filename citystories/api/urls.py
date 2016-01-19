@@ -20,6 +20,7 @@ urlpatterns = [
     url('^notes/$', NoteMapView.as_view()),
     url('^userentries/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', UserEntryView.as_view()),
     url('^userentries/$', CreateUserEntryViewSet.as_view()),
+    url('^uservotes/', 'api.views.user_votes', name='user_votes'),
     url('^alldatalessthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', AllDataLessThanView.as_view()),
     url('^alldatagreaterthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', AllDataGreaterThanView.as_view()),
     url('^dfifilm/$', DfiFilmView.as_view()),

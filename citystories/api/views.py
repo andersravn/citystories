@@ -3,26 +3,15 @@
 
 from itertools import chain
 
-from django.shortcuts import render, render_to_response, redirect
-from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from django.shortcuts import render
 from django.contrib.gis.geos import fromstr
-from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned
 
-from rest_framework import permissions, viewsets, generics
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework.permissions import AllowAny
 from drf_multiple_model.views import MultipleModelAPIView
 
-from api import utils
-
-from .permissions import IsAuthorOrReadOnly, IsStaffOrTargetUser
 from .serializers import UserEntrySerializer, LimitedUserEntrySerializer, NoteSerializer, LimitedNoteSerializer, \
     DfiFilmSerializer
 from .models import UserEntry, Note, DfiFilm, NoteVote, UserentryVote
@@ -68,6 +57,7 @@ class AllDataGreaterThanView(MultipleModelAPIView):
             (Note.objects.filter(no_good=False, pnt__distance_gt=(pnt, int(distance))), LimitedNoteSerializer),
         ]
         return queryList
+
 
 # USER ENTRIES
 class UserEntryView(generics.ListAPIView):
@@ -116,6 +106,15 @@ class DfiFilmView(generics.ListAPIView):
     serializer_class = DfiFilmSerializer
 
 
+@api_view(['GET'])
+def user_votes(request):
+    user = request.user
+    note_ids = Note.objects.filter(notevote__user=user).only('uuid')
+    userentry_ids = UserEntry.objects.filter(userentryvote__user=user).only('uuid')
+    ids = list(chain(note_ids, userentry_ids))
+    return Response({"data": ids})
+
+
 @api_view(['POST'])
 def upvote(request, info):
     if request.method == 'POST':
@@ -128,11 +127,23 @@ def upvote(request, info):
             try:  # Try to find existing vote for the given note
                 notevote = NoteVote.objects.get(user=request.user, note=note)
                 if notevote.value == -1:  # If previous vote was negative
+                    note.rating += 2  # Add two positive votes to compensate for negative vote
+                    note.save()
+                    notevote.value = 1  # Change the vote to a positive one
+                    notevote.save()
+                    return Response({"message": "upvoted"})
+                elif notevote.value == 0:
                     note.rating += 1  # Add one positive vote
                     note.save()
                     notevote.value = 1  # Change the vote to a positive one
                     notevote.save()
                     return Response({"message": "upvoted"})
+                elif notevote.value == 1:  # Unvote
+                    note.rating -= 1
+                    note.save()
+                    notevote.value = 0  # Change to no vote
+                    notevote.save()
+                    return Response({"message": "unvoted"})
             except NoteVote.DoesNotExist:  # If no existing vote is found
                 note.rating += 1
                 note.save()
@@ -149,11 +160,23 @@ def upvote(request, info):
             try:
                 userentryvote = UserentryVote.objects.get(user=request.user, userentry=userentry)
                 if userentryvote.value == -1:  # If previous vote was negative
+                    userentry.rating += 2  # Add two positive votes to compensate for negative vote
+                    userentry.save()
+                    userentryvote.value = 1  # Change the vote to a positive one
+                    userentryvote.save()
+                    return Response({"message": "upvoted"})
+                elif userentryvote.value == 0:
                     userentry.rating += 1  # Add one positive vote
                     userentry.save()
                     userentryvote.value = 1  # Change the vote to a positive one
                     userentryvote.save()
                     return Response({"message": "upvoted"})
+                elif userentryvote.value == 1:  # Unvote
+                    userentry.rating -= 1
+                    userentry.save()
+                    userentryvote.value = 0  # Change to no vote
+                    userentryvote.save()
+                    return Response({"message": "unvoted"})
             except UserentryVote.DoesNotExist:  # If no existing vote is found
                 userentry.rating += 1
                 userentry.save()
@@ -178,11 +201,23 @@ def downvote(request, info):
             try:  # Try to find existing vote for the given note
                 notevote = NoteVote.objects.get(user=request.user, note=note)
                 if notevote.value == 1:  # If previous vote was positive
+                    note.rating -= 2  # Add two negative votes to compensate for positive vote
+                    note.save()
+                    notevote.value = -1  # Change the vote to a negative one
+                    notevote.save()
+                    return Response({"message": "downvoted"})
+                elif notevote.value == 0:  # If previous vote was positive
                     note.rating -= 1  # Add one negative vote
                     note.save()
                     notevote.value = -1  # Change the vote to a negative one
                     notevote.save()
                     return Response({"message": "downvoted"})
+                elif notevote.value == -1:  # Unvote
+                    note.rating += 1
+                    note.save()
+                    notevote.value = 0  # Change to no vote
+                    notevote.save()
+                    return Response({"message": "unvoted"})
             except NoteVote.DoesNotExist:  # If no existing vote is found
                 note.rating -= 1
                 note.save()
@@ -199,11 +234,23 @@ def downvote(request, info):
             try:
                 userentryvote = UserentryVote.objects.get(user=request.user, userentry=userentry)
                 if userentryvote.value == 1:  # If previous vote was positive
+                    userentry.rating -= 2  # Add two negative votes to compensate for positive vote
+                    userentry.save()
+                    userentryvote.value = -1  # Change the vote to a negative one
+                    userentryvote.save()
+                    return Response({"message": "downvoted"})
+                elif userentryvote.value == 0:  # If previous vote was positive
                     userentry.rating -= 1  # Add one negative vote
                     userentry.save()
                     userentryvote.value = -1  # Change the vote to a negative one
                     userentryvote.save()
                     return Response({"message": "downvoted"})
+                elif userentryvote.value == -1:  # Unvote
+                    userentry.rating += 1
+                    userentry.save()
+                    userentryvote.value = 0  # Change to no vote
+                    userentryvote.save()
+                    return Response({"message": "unvoted"})
             except UserentryVote.DoesNotExist:  # If no existing vote is found
                 userentry.rating -= 1
                 userentry.save()

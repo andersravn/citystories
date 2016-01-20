@@ -17,6 +17,17 @@ class LimitedUserEntrySerializer(serializers.ModelSerializer):
         read_only_fields = ('uuid', 'type', 'rating', 'lat', 'lng', 'created')
 
 
+class UuidUserEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserEntry
+        fields = ('uuid',)
+        read_only_fields = ('uuid',)
+
+
+class UserVoteSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField()
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -37,6 +48,13 @@ class LimitedNoteSerializer(serializers.ModelSerializer):
         model = Note
         fields = ('uuid', 'type', 'lat', 'lng', 'rating')
         read_only_fields = ('uuid', 'type', 'lat', 'lng', 'rating')
+
+
+class UuidNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ('uuid',)
+        read_only_fields = ('uuid',)
 
 
 class DfiFilmSerializer(serializers.ModelSerializer):

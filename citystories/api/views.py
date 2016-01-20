@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from drf_multiple_model.views import MultipleModelAPIView
 
 from .serializers import UserEntrySerializer, LimitedUserEntrySerializer, NoteSerializer, LimitedNoteSerializer, \
-    DfiFilmSerializer
+    DfiFilmSerializer, UserVoteSerializer
 from .models import UserEntry, Note, DfiFilm, NoteVote, UserentryVote
 
 
@@ -40,6 +40,21 @@ class AllDataLessThanView(MultipleModelAPIView):
             (Note.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))), NoteSerializer),
         ]
         return queryList
+
+
+class UserVotes(generics.ListAPIView):
+    serializer_class = UserVoteSerializer
+
+    def get_queryset(self):
+        return list(chain(UserEntry.objects.filter(userentryvote__user=self.request.user),
+                          Note.objects.filter(notevote__user=self.request.user)))
+
+
+class MyUserEntries(generics.ListAPIView):
+    serializer_class = UserEntrySerializer
+
+    def get_queryset(self):
+        return UserEntry.objects.filter(user=self.request.user)
 
 
 class AllDataGreaterThanView(MultipleModelAPIView):
@@ -104,15 +119,6 @@ class NoteMapView(generics.ListAPIView):
 class DfiFilmView(generics.ListAPIView):
     queryset = DfiFilm.objects.all()
     serializer_class = DfiFilmSerializer
-
-
-@api_view(['GET'])
-def user_votes(request):
-    user = request.user
-    note_ids = Note.objects.filter(notevote__user=user).only('uuid')
-    userentry_ids = UserEntry.objects.filter(userentryvote__user=user).only('uuid')
-    ids = list(chain(note_ids, userentry_ids))
-    return Response({"data": ids})
 
 
 @api_view(['POST'])

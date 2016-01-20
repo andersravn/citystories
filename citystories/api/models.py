@@ -108,12 +108,18 @@ class NoteVote(models.Model):
     value = models.SmallIntegerField()
     created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.user.username + " - " + str(self.note.uuid)
+
 
 class UserentryVote(models.Model):
     user = models.ForeignKey(User)
     userentry = models.ForeignKey(UserEntry)
     value = models.SmallIntegerField()
     created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username + " - " + str(self.userentry.uuid)
 
 
 class LatestPlace(models.Model):

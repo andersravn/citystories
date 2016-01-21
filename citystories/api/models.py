@@ -3,6 +3,7 @@
 
 import uuid
 
+from django.utils import timezone
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.utils.deconstruct import deconstructible
@@ -49,7 +50,7 @@ class UserEntry(models.Model):
     pnt = models.PointField(null=True, blank=True, geography=True)
     no_good = models.BooleanField(default=False)
     objects = models.GeoManager()
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now, editable=False)
 
     def __str__(self):
         return self.text_content

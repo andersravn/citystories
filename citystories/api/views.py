@@ -42,21 +42,6 @@ class AllDataLessThanView(MultipleModelAPIView):
         return queryList
 
 
-class UserVotes(generics.ListAPIView):
-    serializer_class = UserVoteSerializer
-
-    def get_queryset(self):
-        return list(chain(UserEntry.objects.filter(userentryvote__user=self.request.user),
-                          Note.objects.filter(notevote__user=self.request.user)))
-
-
-class MyUserEntries(generics.ListAPIView):
-    serializer_class = UserEntrySerializer
-
-    def get_queryset(self):
-        return UserEntry.objects.filter(user=self.request.user)
-
-
 class AllDataGreaterThanView(MultipleModelAPIView):
     flat = True
     sorting_field = 'rating'
@@ -72,6 +57,38 @@ class AllDataGreaterThanView(MultipleModelAPIView):
             (Note.objects.filter(no_good=False, pnt__distance_gt=(pnt, int(distance))), LimitedNoteSerializer),
         ]
         return queryList
+
+
+class UserVotes(generics.ListAPIView):
+    serializer_class = UserVoteSerializer
+
+    def get_queryset(self):
+        userentryvotes = UserentryVote.objects.filter(user=self.request.user)
+        notevotes = NoteVote.objects.filter(user=self.request.user)
+
+        userentry_info = []
+        note_info = []
+
+        for i in range(0, userentryvotes.count()):
+            entry = dict()
+            entry['uuid'] = userentryvotes[i].userentry.uuid
+            entry['value'] = userentryvotes[i].value
+            userentry_info.append(entry)
+
+        for i in range(0, notevotes.count()):
+            note = dict()
+            note['uuid'] = notevotes[i].note.uuid
+            note['value'] = notevotes[i].value
+            note_info.append(note)
+
+        return list(chain(userentry_info, note_info))
+
+
+class MyUserEntries(generics.ListAPIView):
+    serializer_class = UserEntrySerializer
+
+    def get_queryset(self):
+        return UserEntry.objects.filter(user=self.request.user)
 
 
 # USER ENTRIES

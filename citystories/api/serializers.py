@@ -26,6 +26,7 @@ class UuidUserEntrySerializer(serializers.ModelSerializer):
 
 class UserVoteSerializer(serializers.Serializer):
     uuid = serializers.UUIDField()
+    value = serializers.IntegerField()
 
 
 class UserSerializer(serializers.ModelSerializer):

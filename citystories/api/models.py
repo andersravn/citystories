@@ -48,6 +48,7 @@ class UserEntry(models.Model):
     lat = models.CharField(max_length=20, null=True, blank=True)
     lng = models.CharField(max_length=20, null=True, blank=True)
     pnt = models.PointField(null=True, blank=True, geography=True)
+    place = models.CharField(max_length=55, null=True, blank=True)
     no_good = models.BooleanField(default=False)
     objects = models.GeoManager()
     created = models.DateTimeField(default=timezone.now, editable=False)

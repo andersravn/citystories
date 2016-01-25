@@ -16,6 +16,8 @@ from .serializers import UserEntrySerializer, LimitedUserEntrySerializer, NoteSe
     DfiFilmSerializer, UserVoteSerializer
 from .models import UserEntry, Note, DfiFilm, NoteVote, UserentryVote
 
+from .utils import get_address
+
 
 def front_view(request):
     context = {}
@@ -110,7 +112,8 @@ class CreateUserEntryViewSet(generics.ListCreateAPIView):
     serializer_class = UserEntrySerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        place = get_address(self.request.data['lat'], self.request.data['lng'])
+        serializer.save(user=self.request.user, place=place)
 
 
 # NOTES #
@@ -126,7 +129,7 @@ class NoteView(generics.ListAPIView):
         return Note.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))).order_by('-rating')
 
 
-# For the map view, that needs all entries
+# For the map view, that needs all notes
 class NoteMapView(generics.ListAPIView):
     queryset = Note.objects.filter(no_good=False)
     serializer_class = NoteSerializer

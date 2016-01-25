@@ -7,7 +7,7 @@ from api.models import UserEntry, Note, DfiFilm
 class UserEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserEntry
-        fields = ('uuid', 'type', 'user', 'text_content', 'rating', 'lat', 'lng', 'pnt', 'created')
+        fields = ('uuid', 'type', 'user', 'text_content', 'rating', 'lat', 'lng', 'pnt', 'place', 'created')
 
 
 class LimitedUserEntrySerializer(serializers.ModelSerializer):

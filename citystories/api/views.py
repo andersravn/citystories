@@ -112,7 +112,7 @@ class CreateUserEntryViewSet(generics.ListCreateAPIView):
     serializer_class = UserEntrySerializer
 
     def perform_create(self, serializer):
-        place = get_address(self.request.data['lat'], self.request.data['lng'])
+        place = get_address(str(self.request.data['lat']), str(self.request.data['lng']))
         serializer.save(user=self.request.user, place=place)
 
 

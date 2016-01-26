@@ -59,11 +59,13 @@ INSTALLED_APPS = (
     'corsheaders',
     'api',
     'dashboard',
+    'opbeat.contrib.django',
 )
 
 SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
+    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -115,6 +117,12 @@ AUTHENTICATION_BACKENDS = (
 )
 
 ACCOUNT_EMAIL_REQUIRED = False
+
+OPBEAT = {
+    'ORGANIZATION_ID': get_env_variable('OP_ORGANIZATION_ID'),
+    'APP_ID': get_env_variable('OP_APP_ID'),
+    'SECRET_TOKEN': get_env_variable('OP_SECRET_TOKEN'),
+}
 
 WSGI_APPLICATION = 'config.wsgi.application'
 

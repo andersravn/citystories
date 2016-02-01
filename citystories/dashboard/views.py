@@ -5,11 +5,14 @@ from django.shortcuts import render, render_to_response, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 import dashboard.scripts as scripts
 from api.models import Place
 
 # Create your views here.
+
+from api.models import UserEntry, Note
 
 
 def dash_view(request):
@@ -23,6 +26,47 @@ def dash_view(request):
             return redirect('/dash/login/')
 
 
+@login_required(login_url='/dash/login/')
+def userentry_reports_view(request):
+    context = {}
+    template_name = 'dashboard/userentry_reports.html'
+
+    if request.method == 'GET':
+        context['userentries'] = UserEntry.objects.filter(reported=True, no_good=False)
+        return render(request, template_name, context)
+
+    if request.method == 'POST':
+        uuid = request.POST['uuid']
+        userentry = UserEntry.objects.get(pk=uuid)
+        if 'rm-userentry' in request.POST:
+            userentry.no_good = True
+            userentry.save()
+        elif 'del-userentry' in request.POST:
+            userentry.delete()
+        return redirect('/dash/userentry-reports/')
+
+
+@login_required(login_url='/dash/login/')
+def note_reports_view(request):
+    context = {}
+    template_name = 'dashboard/note_reports.html'
+
+    if request.method == 'GET':
+        context['notes'] = Note.objects.filter(reported=True, no_good=False)
+        return render(request, template_name, context)
+
+    if request.method == 'POST':
+        uuid = request.POST['uuid']
+        note = Note.objects.get(pk=uuid)
+        if 'rm-note' in request.POST:
+            note.no_good = True
+            note.save()
+        elif 'del-note' in request.POST:
+            note.delete()
+        return redirect('/dash/note-reports/')
+
+
+@login_required(login_url='/dash/login/')
 def add_street_view(request):
     context = {}
     template_name = 'dashboard/add_street.html'
@@ -37,6 +81,16 @@ def add_street_view(request):
         return redirect('/dash/add-street/')
 
 
+@login_required(login_url='/dash/login/')
+def filter_view(request):
+    context = {}
+    template_name = 'dashboard/filter.html'
+
+    if request.method == 'GET':
+        return render(request, template_name, context)
+
+
+@login_required(login_url='/dash/login/')
 def stadsarkiv_api(request):
     context = {}
     template_name = 'dashboard/stadsarkiv_api.html'
@@ -46,6 +100,7 @@ def stadsarkiv_api(request):
         return render(request, template_name, context)
 
 
+@login_required(login_url='/dash/login/')
 def scripts_view(request):
     context = {}
     template_name = 'dashboard/scripts.html'
@@ -54,6 +109,7 @@ def scripts_view(request):
         return render(request, template_name, context)
 
 
+@login_required(login_url='/dash/login/')
 def load_csv(request):
     if request.method == 'GET':
         scripts.load_csv()  # Indsætter alle unikke steder i Sejrs Sedler.
@@ -65,6 +121,7 @@ def load_csv(request):
         return redirect('/dash/scripts/')
 
 
+@login_required(login_url='/dash/login/')
 def add_pnt_fields(request):
     if request.method == 'GET':
         scripts.add_pnt_fields() # Tilføjer pnt felter til alle Note objekter i databasen.

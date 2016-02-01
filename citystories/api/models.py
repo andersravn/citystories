@@ -50,6 +50,7 @@ class UserEntry(models.Model):
     pnt = models.PointField(null=True, blank=True, geography=True)
     place = models.CharField(max_length=55, null=True, blank=True)
     no_good = models.BooleanField(default=False)
+    reported = models.BooleanField(default=False)
     objects = models.GeoManager()
     created = models.DateTimeField(default=timezone.now, editable=False)
 
@@ -76,6 +77,7 @@ class Note(models.Model):
     from_date = models.DateField()
     media = models.BooleanField(default=False)
     no_good = models.BooleanField(default=False)
+    reported = models.BooleanField(default=False)
     lat = models.CharField(max_length=12, default='none')
     lng = models.CharField(max_length=12, default='none')
     place = models.ForeignKey(Place)

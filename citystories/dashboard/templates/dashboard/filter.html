@@ -1,0 +1,17 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+  <h1>Filter</h1>
+  <div class="row">
+    <div class="col-lg-4">
+      <form method="post" action="/dash/filter/">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Søg efter et ord...">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button">Søg</button>
+          </span>
+        </div><!-- /input-group -->
+      </form>
+    </div><!-- /.col-lg-6 -->
+  </div><!-- /.row -->
+{% endblock %}

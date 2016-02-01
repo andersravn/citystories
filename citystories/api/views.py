@@ -296,11 +296,11 @@ def report(request, info):
         info = info.split(',')
         if info[1] == 'note':
             note = Note.objects.get(pk=info[0])
-            note.no_good = True
+            note.reported = True
             note.save()
         if info[1] == 'userentry':
             userentry = UserEntry.objects.get(pk=info[0])
-            userentry.no_good = True
+            userentry.reported = True
             userentry.save()
         return Response({"message": "Reported!"})
     return Response({"message": "Can not compute..."})

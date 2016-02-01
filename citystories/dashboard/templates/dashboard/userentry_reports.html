@@ -1,0 +1,23 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Userentries</h2>
+      <div class="list-group">
+        {% for userentry in userentries %}
+          <div class="list-group-item">
+            {{ userentry.text_content }}<br />
+            <small>Brugernavn: {{ userentry.user.username }} Sted: {{ userentry.place.name }} Rating: {{ userentry.rating }} UUID: {{ userentry.uuid }}</small>
+            <form method="post" action="/dash/userentry-reports/">
+              {% csrf_token %}
+              <input type="hidden" name="uuid" value="{{ userentry.uuid }}" />
+              <button class="btn btn-default btn-xs" name="rm-userentry">Fjern</button>
+              <button class="btn btn-danger btn-xs" name="del-userentry">Slet</button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -89,6 +89,29 @@ def filter_view(request):
     if request.method == 'GET':
         return render(request, template_name, context)
 
+    if request.method == 'POST':
+        if 'search' in request.POST:
+            filterterm = request.POST['filter-term']
+            notes = Note.objects.filter(text_content__icontains=filterterm)
+            context['notes_count'] = notes.count()
+            context['notes'] = notes
+            return render(request, template_name, context)
+        if 'rm-notes' in request.POST:
+            uuids = request.POST.getlist('uuid')
+
+            for uuid in uuids:
+                note = Note.objects.get(pk=uuid)
+                note.no_good = True
+                note.save()
+            return redirect('/dash/filter/')
+        if 'del-notes' in request.POST:
+            uuids = request.POST.getlist('uuid')
+
+            for uuid in uuids:
+                note = Note.objects.get(pk=uuid)
+                note.delete()
+            return redirect('/dash/filter/')
+
 
 @login_required(login_url='/dash/login/')
 def stadsarkiv_api(request):

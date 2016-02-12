@@ -24,3 +24,9 @@ DATABASES = {
 }
 
 INSTALLED_APPS += ('debug_toolbar',)
+
+OPBEAT = {
+    'ORGANIZATION_ID': get_env_variable('OP_ORGANIZATION_ID'),
+    'APP_ID': get_env_variable('OP_APP_ID'),
+    'SECRET_TOKEN': get_env_variable('OP_SECRET_TOKEN'),
+}

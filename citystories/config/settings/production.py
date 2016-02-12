@@ -30,7 +30,7 @@ DATABASES = {
 }
 
 OPBEAT = {
-    'ORGANIZATION_ID': os.environ['OP_ORGANIZATION_ID'],
-    'APP_ID': os.environ['OP_APP_ID'],
-    'SECRET_TOKEN': os.environ['OP_SECRET_TOKEN'],
+    'ORGANIZATION_ID': get_env_variable('OP_ORGANIZATION_ID'),
+    'APP_ID': get_env_variable('OP_APP_ID'),
+    'SECRET_TOKEN': get_env_variable('OP_SECRET_TOKEN'),
 }

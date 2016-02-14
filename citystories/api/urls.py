@@ -6,13 +6,15 @@ from rest_framework import routers
 from rest_framework.authtoken import views
 
 from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet, AllDataLessThanView, \
-    AllDataGreaterThanView, UserVotes, MyUserEntries
+    AllDataGreaterThanView, UserVotes, MyUserEntries, LoginViewCustom
 
 router = routers.DefaultRouter()
 
 urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token-auth/', views.obtain_auth_token),
+    url(r'^rest-auth/login/$', LoginViewCustom.as_view(), name='rest_login'),
+    url(r'^rest-auth/', include('rest_auth.urls')),
     url('^vote/up/(?P<info>.+)/', 'api.views.upvote', name='upvote'),
     url('^vote/down/(?P<info>.+)/', 'api.views.downvote', name='downvote'),
     url('^report/(?P<info>.+)/', 'api.views.report', name='report'),

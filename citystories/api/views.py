@@ -29,6 +29,11 @@ def front_view(request):
         return render(request, template_name, context)
 
 
+class LoginViewCustom(LoginView):
+    authentication_classes = (TokenAuthentication,)
+    # comment to provoke a change in the file
+
+
 class AllDataLessThanView(MultipleModelAPIView):
     flat = True
     sorting_field = 'rating'

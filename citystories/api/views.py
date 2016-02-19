@@ -10,9 +10,6 @@ from django.core.exceptions import MultipleObjectsReturned
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import authentication_classes
-from rest_auth.registration.views import LoginView
 from drf_multiple_model.views import MultipleModelAPIView
 
 from .serializers import UserEntrySerializer, LimitedUserEntrySerializer, NoteSerializer, LimitedNoteSerializer, \
@@ -28,10 +25,6 @@ def front_view(request):
 
     if request.method == 'GET':
         return render(request, template_name, context)
-
-
-class LoginViewCustom(LoginView):
-    authentication_classes = (TokenAuthentication,)
 
 
 class AllDataLessThanView(MultipleModelAPIView):
@@ -93,7 +86,6 @@ class UserVotes(generics.ListAPIView):
         return list(chain(userentry_info, note_info))
 
 
-@authentication_classes(TokenAuthentication)
 class MyUserEntries(generics.ListAPIView):
     serializer_class = UserEntrySerializer
 
@@ -150,7 +142,6 @@ class DfiFilmView(generics.ListAPIView):
 
 
 @api_view(['POST'])
-@authentication_classes(TokenAuthentication)
 def upvote(request, info):
     if request.method == 'POST':
         # info from the request is 'uuid,type'
@@ -225,7 +216,6 @@ def upvote(request, info):
 
 
 @api_view(['POST'])
-@authentication_classes(TokenAuthentication)
 def downvote(request, info):
     if request.method == 'POST':
         # info from the request is 'uuid,type'

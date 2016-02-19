@@ -10,6 +10,8 @@ from django.core.exceptions import MultipleObjectsReturned
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
+from rest_auth.registration.views import LoginView
 from drf_multiple_model.views import MultipleModelAPIView
 
 from .serializers import UserEntrySerializer, LimitedUserEntrySerializer, NoteSerializer, LimitedNoteSerializer, \
@@ -25,6 +27,10 @@ def front_view(request):
 
     if request.method == 'GET':
         return render(request, template_name, context)
+
+
+class LoginViewCustom(LoginView):
+    authentication_classes = (TokenAuthentication,)
 
 
 class AllDataLessThanView(MultipleModelAPIView):

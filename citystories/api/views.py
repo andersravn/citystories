@@ -31,6 +31,7 @@ def front_view(request):
 
 class LoginViewCustom(LoginView):
     authentication_classes = (TokenAuthentication,)
+    # comment to provoke a change in the file
 
 
 class AllDataLessThanView(MultipleModelAPIView):

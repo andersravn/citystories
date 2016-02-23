@@ -1,0 +1,26 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Notes</h2>
+        Fandt {{ quantity }} sedler, der mangler koordinater.<br /><br />
+        <form method="post" action="/dash/filter/">
+          {% csrf_token %}
+          <button type="button" class="btn btn-default btn-xs" onclick="toggle()">Vælg alle</button>
+          <button class="btn btn-default btn-xs" name="rm-notes">Fjern valgte</button>
+          <button class="btn btn-danger btn-xs" name="del-notes">Slet valgte</button>
+          <br /><br />
+          <div class="list-group">
+            {% for note in notes %}
+              <div class="list-group-item">
+                {{ note.text_content }}<br />
+                <input type="checkbox" class="custom-checkbox" name="uuid" value="{{ note.uuid }}" data-toggle="toggle" data-on="Fravælg" data-off="Vælg" data-size="mini" />
+                <small>Sted: {{ note.place.name }} Rating: {{ note.rating }} UUID: {{ note.uuid }}</small>
+              </div>
+            {% endfor %}
+          </div>
+        </form>
+    </div>
+  </div>
+{% endblock %}

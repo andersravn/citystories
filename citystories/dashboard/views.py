@@ -8,11 +8,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 import dashboard.scripts as scripts
-from api.models import Place
 
 # Create your views here.
 
-from api.models import UserEntry, Note
+from api.models import UserEntry, Note, Place
 
 
 def dash_view(request):
@@ -133,14 +132,53 @@ def scripts_view(request):
 
 
 @login_required(login_url='/dash/login/')
+def missing_coords(request):
+    context = {}
+    template_name = 'dashboard/missing_coords.html'
+
+    if request.method == 'GET':
+        context['notes'] = Note.objects.filter(lat=0)
+        context['quantity'] = Note.objects.filter(lat=0).count()
+        return render(request, template_name, context)
+
+
+@login_required(login_url='/dash/login/')
 def load_csv(request):
     if request.method == 'GET':
         scripts.load_csv()  # Indsætter alle unikke steder i Sejrs Sedler.
-        #scripts.get_notes()  # Henter data fra stadsarkivets api for hvert unikt steds id.
-        #scripts.delete_duplicates()
-        #scripts.add_coords()
 
         messages.success(request, 'Stederne er loaded i databasen!')
+        return redirect('/dash/scripts/')
+
+
+@login_required(login_url='/dash/login/')
+def load_notes(request):
+    if request.method == 'GET':
+        places = Place.objects.filter(notes_loaded=False)
+        for place in places:
+            scripts.get_notes(place)  # Henter data fra stadsarkivets api for hvert unikt steds id.
+        messages.success(request, 'Alle notes er loaded!')
+        return redirect('/dash/scripts/')
+
+@login_required(login_url='/dash/login/')
+def delete_duplicates(request):
+    if request.method == 'GET':
+        duplicates_deleted = scripts.delete_duplicates()
+        #scripts.add_coords()
+        messages.success(request, duplicates_deleted + 'kopier er slettet!')
+        return redirect('/dash/scripts/')
+
+
+@login_required(login_url='/dash/login/')
+def delete_notes(request):
+    if request.method == 'GET':
+        places = Place.objects.filter(notes_loaded=True)
+        for place in places:
+            place.notes_loaded = False
+            place.save()
+        notes = Note.objects.all()
+        notes.delete()
+        messages.success(request, 'Notes er blevet slettet!')
         return redirect('/dash/scripts/')
 
 

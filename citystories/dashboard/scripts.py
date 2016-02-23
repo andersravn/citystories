@@ -48,21 +48,58 @@ def get_coords(address):
 # Henter data fra stadsarkivets api for hvert unikt steds id.
 # Hentede 11036 notes ved første run.
 def get_notes(place):
-    url = 'https://openaws.appspot.com/records?collection=1&locations='
+    special_cases = {
+        'Joh. Baunes Plads': 'Johannes Baunes Plads',
+        'Marselisborg Gods': 'Marselisborg Gymnasium',
+    }
 
-    response = requests.get(url + str(place.placeid))
-    data = response.json()
+    records_url = 'https://openaws.appspot.com/records?collection=1&locations='
+    entities_url = 'https://openaws.appspot.com/entities/'
+
+    records_response = requests.get(records_url + str(place.placeid))
+    entities_response = requests.get(entities_url + str(place.placeid))
+
+    records_data = records_response.json()
+    entities_data = entities_response.json()
     note_type = ''
-    loaded = 0
-    lat, lon = get_coords(str(place))
+    lat = 0
+    lon = 0
+    place_lol = False
+
+    if entities_data['result']['entity_type'][1] == 'Address':
+        try:
+            lat = str(entities_data['result']['latitude'])
+            lon = str(entities_data['result']['longitude'])
+        except KeyError:
+            return
+    elif entities_data['result']['entity_type'][1] == 'Place':
+        if entities_data['result']['name'] == 'Joh. Baunes Plads':
+            lat, lon = get_coords('Johannes Baunes Plads')
+        elif entities_data['result']['name'] == 'Marselisborg Gods':
+            lat, lon = get_coords('Marselisborg Gymnasium')
+        elif entities_data['result']['name'] == 'Skejby Mark':
+            lat, lon = get_coords('Herredsvej')
+        elif entities_data['result']['name'] == 'Mindebro':
+            lat, lon = 56.152618, 10.213938
+        elif entities_data['result']['name'] == 'Solgaarden':
+            lat, lon = 56.149237, 10.157762
+        elif entities_data['result']['name'] == 'Bispetoften':
+            lat, lon = 0, 0
+        elif entities_data['result']['name'] == 'Aarhus Kunstbygning':
+            lat, lon = get_coords('Kunsthal Aarhus')
+        else:
+            try:
+                lat, lon = get_coords(entities_data['result']['name'])
+            except IndexError:
+                lat, lon = 0, 0
 
     # Tjekker om result objektet er tomt.
     try:
-        data['result'][0]
+        records_data['result'][0]
     except IndexError:
         return
 
-    for r in data['result']:
+    for r in records_data['result']:
         if 'personalsedler' in r['description']['hierarchical_level'].lower():
             note_type = 'personal'
         else:
@@ -95,7 +132,7 @@ def get_notes(place):
         if analog_content is not 'none':
             analog_content = r['analog_content']['storage_id']
 
-        pnt = fromstr('POINT(' + lon + ' ' + lat + ')', srid=4326)
+        pnt = fromstr('POINT(' + str(lon) + ' ' + str(lat) + ')', srid=4326)
 
         note = Note(note_id=analog_content,
                     text_content=r['description']['textcontent'],
@@ -107,15 +144,18 @@ def get_notes(place):
                     pnt=pnt,
                     place=place)
         note.save()
-        loaded += 1
-    return loaded
+        place.notes_loaded = True
+        place.save()
 
 
 # 8494 tilbage efter første run.
 def delete_duplicates():
+    deleted = 0
     for row in Note.objects.all():
         if Note.objects.filter(note_id=row.note_id, note_type=row.note_type).count() > 1:
             row.delete()
+            deleted += 1
+    return deleted
 
 
 def add_street(street):

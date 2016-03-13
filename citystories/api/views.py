@@ -307,7 +307,10 @@ def report(request, info):
             note.save()
         if info[1] == 'userentry':
             userentry = UserEntry.objects.get(pk=info[0])
-            userentry.reported = True
-            userentry.save()
+            if request.user == userentry.user:
+                userentry.delete()
+            else:
+                userentry.reported = True
+                userentry.save()
         return Response({"message": "Reported!"})
     return Response({"message": "Can not compute..."})

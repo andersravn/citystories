@@ -5,6 +5,7 @@ from itertools import chain
 
 from django.shortcuts import render
 from django.contrib.gis.geos import fromstr
+from django.contrib.gis.measure import Distance as D
 from django.core.exceptions import MultipleObjectsReturned
 
 from rest_framework import generics
@@ -45,8 +46,8 @@ class AllDataLessThanView(MultipleModelAPIView):
         pnt = fromstr('POINT(' + lon + ' ' + lat + ')', srid=4326)
 
         queryList = [
-            (UserEntry.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))), UserEntrySerializer),
-            (Note.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))), NoteSerializer),
+            (UserEntry.objects.filter(no_good=False, pnt__dwithin=(pnt, D(m=int(distance)))), UserEntrySerializer),
+            (Note.objects.filter(no_good=False, pnt__dwithin=(pnt, D(m=int(distance)))), NoteSerializer),
         ]
         return queryList
 

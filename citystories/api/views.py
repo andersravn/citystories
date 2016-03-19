@@ -46,8 +46,8 @@ class AllDataLessThanView(MultipleModelAPIView):
         pnt = fromstr('POINT(' + lon + ' ' + lat + ')', srid=4326)
 
         queryList = [
-            (UserEntry.objects.filter(no_good=False, pnt__dwithin=(pnt, D(m=int(distance)))), UserEntrySerializer),
-            (Note.objects.filter(no_good=False, pnt__dwithin=(pnt, D(m=int(distance)))), NoteSerializer),
+            (UserEntry.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))), UserEntrySerializer),
+            (Note.objects.filter(no_good=False, pnt__distance_lte=(pnt, int(distance))), NoteSerializer),
         ]
         return queryList
 

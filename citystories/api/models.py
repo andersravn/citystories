@@ -81,7 +81,7 @@ class Note(models.Model):
     lat = models.CharField(max_length=20, default='none')
     lng = models.CharField(max_length=20, default='none')
     place = models.ForeignKey(Place)
-    pnt = models.PointField(null=True, blank=True, geography=True)
+    # pnt = models.PointField(null=True, blank=True)
     rating = models.IntegerField(default=1)
     created = models.DateTimeField(auto_now_add=True)
     last_changed = models.DateTimeField(auto_now=True, null=True)

@@ -6,7 +6,7 @@ from rest_framework import routers
 from rest_framework.authtoken import views
 
 from .views import NoteView, NoteMapView, UserEntryView, DfiFilmView, CreateUserEntryViewSet, AllDataLessThanView, \
-    AllDataGreaterThanView, UserVotes, MyUserEntries
+    SomeDataGreaterThanView, UserVotes, MyUserEntries
 
 router = routers.DefaultRouter()
 
@@ -23,7 +23,7 @@ urlpatterns = [
     url('^myvotes/$', UserVotes.as_view()),
     url('^myuserentries', MyUserEntries.as_view()),
     url('^alldatalessthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', AllDataLessThanView.as_view()),
-    url('^alldatagreaterthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', AllDataGreaterThanView.as_view()),
+    url('^somedatagreaterthan/(?P<lat>.+)/(?P<lon>.+)/(?P<distance>.+)/$', SomeDataGreaterThanView.as_view()),
     url('^dfifilm/$', DfiFilmView.as_view()),
 ]
 

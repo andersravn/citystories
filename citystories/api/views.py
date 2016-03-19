@@ -51,7 +51,7 @@ class AllDataLessThanView(MultipleModelAPIView):
         return queryList
 
 
-class AllDataGreaterThanView(MultipleModelAPIView):
+class SomeDataGreaterThanView(MultipleModelAPIView):
     flat = True
     sorting_field = 'rating'
 
